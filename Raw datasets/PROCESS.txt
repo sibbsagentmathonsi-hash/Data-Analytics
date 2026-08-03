@@ -1,0 +1,18 @@
+RAW DATASETS PROCESS
+
+Purpose:
+Store the original source datasets used for the project.
+
+Rules for this folder:
+1. Keep raw files unchanged.
+2. Do not clean, rename columns, or overwrite values inside the raw CSV files.
+3. Place any cleaned outputs in the Data Preparation folder instead.
+4. Record source details such as dataset name, provider, download date, and link where possible.
+5. Use the raw files as the starting point for all analysis scripts and notebooks.
+
+Current datasets:
+- Integrated Food Security Phase Classification
+- Prevalence of severe food insecurity in the population (%)
+
+Marking link:
+This folder supports evidence for the full data pipeline and helps prove that the analysis uses real datasets.

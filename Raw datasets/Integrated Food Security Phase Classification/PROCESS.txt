@@ -1,0 +1,22 @@
+DATASET NOTES
+
+Dataset:
+Integrated Food Security Phase Classification
+
+File:
+IPC_IPC.csv
+
+Source:
+World Bank Data360 / World Bank Open Data
+
+How it should be used:
+1. Filter for South Africa records where REF_AREA is ZAF or REF_AREA_LABEL is South Africa.
+2. Review the indicator labels to separate people in Phase 3 or above from individual food insecurity phases.
+3. Use TIME_PERIOD to identify the reporting period.
+4. Use OBS_VALUE as the main value for counts or percentages.
+5. Check UNIT_MEASURE_LABEL and UNIT_TYPE_LABEL before comparing values, because the file may contain both counts and percentages.
+
+Suggested analysis:
+- Compare food insecurity phase categories.
+- Identify the number or percentage of people in severe phases.
+- Use the results to support charts and report findings.

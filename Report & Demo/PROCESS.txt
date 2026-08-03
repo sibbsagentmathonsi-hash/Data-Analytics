@@ -1,0 +1,21 @@
+REPORT AND DEMO PROCESS
+
+Purpose:
+Prepare the final written submission and optional demo evidence.
+
+What to do in this folder:
+1. Write a 7 to 9 page report in DOCX and PDF formats.
+2. Include dataset details, source links, methods, cleaning steps, charts, database work, findings, and conclusions.
+3. Add screenshots of database queries, charts, and important analysis outputs.
+4. Explain the project story in a way a general reader can follow.
+5. Include clear recommendations or actionable conclusions.
+6. Prepare optional demo notes or a short video showing the repository, code, database, and final charts.
+
+Suggested outputs:
+- NDTA631_Group_Report.docx
+- NDTA631_Group_Report.pdf
+- demo_script.txt
+- screenshots/
+
+Marking link:
+This folder supports the 10 marks for Report and Demo.

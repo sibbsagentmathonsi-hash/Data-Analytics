@@ -1,0 +1,23 @@
+DATA PREPARATION PROCESS
+
+Purpose:
+Prepare the raw food-security datasets for analysis while keeping the original CSV files unchanged.
+
+What to do in this folder:
+1. Load the raw datasets from the Raw datasets folder.
+2. Filter the data for South Africa records where the analysis requires country-specific results.
+3. Rename unclear columns into readable names.
+4. Check for missing values, duplicate records, inconsistent dates, and incorrect data types.
+5. Convert date and time fields into usable formats.
+6. Create cleaned CSV files for later analysis.
+7. Produce descriptive statistics such as count, mean, minimum, maximum, and standard deviation.
+8. Write short notes explaining every important cleaning decision.
+
+Suggested outputs:
+- cleaned_food_security_phase.csv
+- cleaned_severe_food_insecurity.csv
+- data_quality_notes.txt
+- descriptive_statistics.csv
+
+Marking link:
+This folder supports the 15 marks for Data Preparation.

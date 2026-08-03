@@ -1,0 +1,22 @@
+DATASET NOTES
+
+Dataset:
+Prevalence of severe food insecurity in the population (%)
+
+File:
+WB_WDI_SN_ITK_SVFI_ZS.csv
+
+Source:
+World Bank Data360 / World Development Indicators
+
+How it should be used:
+1. Filter for South Africa records where REF_AREA is ZAF or REF_AREA_LABEL is South Africa.
+2. Use TIME_PERIOD as the year.
+3. Use OBS_VALUE as the percentage prevalence value.
+4. Confirm that UNIT_MEASURE_LABEL is Percentage before reporting the result.
+5. Sort the records by year before calculating trends.
+
+Suggested analysis:
+- Track severe food insecurity prevalence over time.
+- Calculate year-to-year change where multiple years are available.
+- Compare the trend with the IPC food insecurity classification findings.

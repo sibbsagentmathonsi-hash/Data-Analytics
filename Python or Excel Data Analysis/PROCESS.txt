@@ -1,0 +1,22 @@
+PYTHON OR EXCEL DATA ANALYSIS PROCESS
+
+Purpose:
+Show practical analysis work using Python, Excel, or both.
+
+What to do in this folder:
+1. Use Python scripts, Jupyter notebooks, or Excel workbooks to clean and transform the data.
+2. Create calculated columns that support the food-security story.
+3. Build pivot tables, grouped summaries, formulas, or Pandas groupby outputs.
+4. Apply conditional formatting if Excel is used.
+5. Create charts or summary tables that can be used in the report.
+6. Keep notebooks and spreadsheets organised so another person can follow the workflow.
+7. Include comments, markdown cells, or notes explaining the steps.
+
+Suggested outputs:
+- analysis_notebook.ipynb
+- excel_analysis.xlsx
+- transformed_tables.csv
+- analysis_summary.txt
+
+Marking link:
+This folder supports the 15 marks for Python or Excel Data Analysis.

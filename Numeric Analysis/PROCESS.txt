@@ -1,0 +1,21 @@
+NUMERICAL ANALYSIS PROCESS
+
+Purpose:
+Use NumPy and numerical methods to calculate useful results from the cleaned food-security datasets.
+
+What to do in this folder:
+1. Load cleaned data from the Data Preparation folder.
+2. Convert important numeric columns into NumPy arrays.
+3. Calculate totals, averages, minimums, maximums, ranges, and percentage changes.
+4. Compare food insecurity values across available time periods.
+5. Reshape arrays where appropriate to show understanding of NumPy operations.
+6. Create summary tables that can be used in the report.
+7. Explain what each numerical result means for the project story.
+
+Suggested outputs:
+- numpy_analysis.ipynb
+- numerical_summary.csv
+- numerical_findings.txt
+
+Marking link:
+This folder supports the 20 marks for NumPy and Numerical Analysis.

@@ -1,0 +1,22 @@
+VISUALISATION PROCESS
+
+Purpose:
+Create charts that clearly explain food-security trends and comparisons.
+
+What to do in this folder:
+1. Use cleaned data from the Data Preparation folder.
+2. Create clear visualisations such as bar charts, scatter plots, line charts, box plots, and histograms where appropriate.
+3. Add titles, axis labels, legends, and units.
+4. Use readable colours and avoid clutter.
+5. Save final charts as PNG or PDF files for the report.
+6. Write short explanations for each chart, including the trend or pattern it shows.
+7. Make sure every chart supports the main project story.
+
+Suggested outputs:
+- severe_food_insecurity_trend.png
+- ipc_phase_comparison.png
+- chart_explanations.txt
+- visualisation_notebook.ipynb
+
+Marking link:
+This folder supports the 20 marks for Visualisation.

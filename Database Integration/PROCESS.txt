@@ -1,0 +1,24 @@
+DATABASE INTEGRATION PROCESS
+
+Purpose:
+Show that the cleaned data can be stored, queried, updated, deleted safely, and loaded back into Pandas or Excel.
+
+What to do in this folder:
+1. Design a simple database schema for the cleaned datasets.
+2. Create database tables for food security phase data and severe food insecurity prevalence.
+3. Import cleaned CSV data into the database.
+4. Write SELECT queries that answer analysis questions.
+5. Demonstrate safe UPDATE and DELETE statements using WHERE clauses.
+6. Export query results to CSV for reporting or visualisation.
+7. Load database query results into Pandas if Python is used.
+8. Save screenshots or query outputs as evidence for the report.
+
+Suggested outputs:
+- schema.sql
+- food_security.db
+- queries.sql
+- query_results.csv
+- database_screenshots/
+
+Marking link:
+This folder supports the 20 marks for Database Integration.
