@@ -1,9 +1,17 @@
 from pathlib import Path
+from html import escape
+from textwrap import wrap
+from zipfile import ZIP_DEFLATED, ZipFile
+import sqlite3
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from matplotlib.backends.backend_pdf import PdfPages
+from openpyxl import Workbook
+from openpyxl.chart import BarChart, LineChart, Reference
+from openpyxl.styles import Font, PatternFill
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -12,6 +20,8 @@ DATA_PREP_DIR = ROOT / "Data Preparation"
 NUMERIC_DIR = ROOT / "Numeric Analysis"
 VIS_DIR = ROOT / "Visualisation"
 ANALYSIS_DIR = ROOT / "Python or Excel Data Analysis"
+DATABASE_DIR = ROOT / "Database Integration"
+REPORT_DIR = ROOT / "Report & Demo"
 
 IPC_RAW = RAW_DIR / "Integrated Food Security Phase Classification" / "IPC_IPC.csv"
 SVFI_RAW = (
@@ -22,7 +32,7 @@ SVFI_RAW = (
 
 
 def ensure_output_dirs() -> None:
-    for directory in [DATA_PREP_DIR, NUMERIC_DIR, VIS_DIR, ANALYSIS_DIR]:
+    for directory in [DATA_PREP_DIR, NUMERIC_DIR, VIS_DIR, ANALYSIS_DIR, DATABASE_DIR, REPORT_DIR]:
         directory.mkdir(parents=True, exist_ok=True)
 
 
@@ -308,6 +318,546 @@ def write_analysis_summary(svfi_zaf: pd.DataFrame, phase_summary: pd.DataFrame) 
     svfi_zaf.to_csv(ANALYSIS_DIR / "transformed_svfi_trend_table.csv", index=False)
 
 
+def write_excel_workbook(svfi_zaf: pd.DataFrame, phase_summary: pd.DataFrame) -> None:
+    workbook = Workbook()
+    workbook.remove(workbook.active)
+
+    summary = workbook.create_sheet("Summary")
+    summary.append(["Section", "Finding"])
+    summary.append([
+        "Severe food insecurity trend",
+        f"Prevalence increased from {svfi_zaf.iloc[0]['obs_value']:.1f}% in {int(svfi_zaf.iloc[0]['year'])} to {svfi_zaf.iloc[-1]['obs_value']:.1f}% in {int(svfi_zaf.iloc[-1]['year'])}.",
+    ])
+    summary.append([
+        "IPC phase snapshot",
+        "The 2020-10 IPC snapshot places 16.0% of the classified population in Phase 3 or above.",
+    ])
+    summary.append([
+        "Interpretation",
+        "The trend dataset shows worsening severe food insecurity, while IPC gives a detailed severity distribution for one snapshot.",
+    ])
+
+    svfi_sheet = workbook.create_sheet("SVFI Trend")
+    svfi_sheet.append(["Year", "Prevalence (%)", "Year-on-year change", "3-year rolling average"])
+    for row in svfi_zaf[["year", "obs_value", "year_on_year_change_percentage_points", "rolling_3_year_average"]].itertuples(index=False):
+        svfi_sheet.append(list(row))
+
+    line_chart = LineChart()
+    line_chart.title = "Severe food insecurity prevalence"
+    line_chart.y_axis.title = "Percent"
+    line_chart.x_axis.title = "Year"
+    line_chart.add_data(Reference(svfi_sheet, min_col=2, min_row=1, max_row=svfi_sheet.max_row), titles_from_data=True)
+    line_chart.set_categories(Reference(svfi_sheet, min_col=1, min_row=2, max_row=svfi_sheet.max_row))
+    svfi_sheet.add_chart(line_chart, "F2")
+
+    phase_sheet = workbook.create_sheet("IPC Phase Snapshot")
+    phase_sheet.append(["Phase", "People", "Percentage"])
+    for row in phase_summary[["phase", "people", "percentage"]].itertuples(index=False):
+        phase_sheet.append(list(row))
+
+    bar_chart = BarChart()
+    bar_chart.title = "IPC phase distribution by percentage"
+    bar_chart.y_axis.title = "Percent"
+    bar_chart.x_axis.title = "Phase"
+    bar_chart.add_data(Reference(phase_sheet, min_col=3, min_row=1, max_row=phase_sheet.max_row), titles_from_data=True)
+    bar_chart.set_categories(Reference(phase_sheet, min_col=1, min_row=2, max_row=phase_sheet.max_row))
+    phase_sheet.add_chart(bar_chart, "E2")
+
+    for sheet in workbook.worksheets:
+        for cell in sheet[1]:
+            cell.font = Font(bold=True, color="FFFFFF")
+            cell.fill = PatternFill("solid", fgColor="305496")
+        for column_cells in sheet.columns:
+            max_length = max(len(str(cell.value)) if cell.value is not None else 0 for cell in column_cells)
+            sheet.column_dimensions[column_cells[0].column_letter].width = min(max(max_length + 2, 12), 55)
+
+    workbook.save(ANALYSIS_DIR / "food_security_analysis_workbook.xlsx")
+
+
+def write_database_outputs(
+    ipc_zaf: pd.DataFrame, ipc_phases: pd.DataFrame, svfi_zaf: pd.DataFrame, phase_summary: pd.DataFrame
+) -> None:
+    database_path = DATABASE_DIR / "food_security.db"
+    if database_path.exists():
+        database_path.unlink()
+
+    with sqlite3.connect(database_path) as connection:
+        ipc_zaf.to_sql("ipc_cleaned", connection, index=False, if_exists="replace")
+        ipc_phases.to_sql("ipc_phase_distribution", connection, index=False, if_exists="replace")
+        svfi_zaf.to_sql("severe_food_insecurity", connection, index=False, if_exists="replace")
+        phase_summary.to_sql("ipc_phase_summary", connection, index=False, if_exists="replace")
+
+        connection.execute("CREATE INDEX idx_svfi_year ON severe_food_insecurity(year)")
+        connection.execute("CREATE INDEX idx_ipc_phase_metric ON ipc_phase_distribution(phase, metric)")
+
+        p3plus_result = pd.read_sql_query(
+            """
+            SELECT
+                SUM(CASE WHEN phase IN ('Phase 3 - Crisis', 'Phase 4 - Emergency', 'Phase 5 - Famine')
+                    THEN obs_value_filled ELSE 0 END) AS crisis_or_worse_people
+            FROM ipc_phase_distribution
+            WHERE metric = 'people';
+            """,
+            connection,
+        )
+        svfi_result = pd.read_sql_query(
+            """
+            SELECT year, obs_value AS severe_food_insecurity_percent,
+                   year_on_year_change_percentage_points,
+                   rolling_3_year_average
+            FROM severe_food_insecurity
+            ORDER BY year;
+            """,
+            connection,
+        )
+        phase_result = pd.read_sql_query(
+            """
+            SELECT phase, people, percentage
+            FROM ipc_phase_summary
+            ORDER BY percentage DESC;
+            """,
+            connection,
+        )
+        update_demo = pd.DataFrame(
+            [
+                {
+                    "operation": "UPDATE demonstration",
+                    "sql_pattern": "UPDATE severe_food_insecurity SET obs_status_label = 'Reviewed for project' WHERE year = 2023;",
+                    "safety_note": "Uses a WHERE clause and should be run only in a copied/demo table for assessment evidence.",
+                },
+                {
+                    "operation": "DELETE demonstration",
+                    "sql_pattern": "DELETE FROM severe_food_insecurity WHERE year IS NULL;",
+                    "safety_note": "Uses a WHERE clause that targets invalid rows only; no valid rows in this project match it.",
+                },
+            ]
+        )
+
+    p3plus_result.to_csv(DATABASE_DIR / "query_result_crisis_or_worse.csv", index=False)
+    svfi_result.to_csv(DATABASE_DIR / "query_result_svfi_trend.csv", index=False)
+    phase_result.to_csv(DATABASE_DIR / "query_result_ipc_phase_rank.csv", index=False)
+    update_demo.to_csv(DATABASE_DIR / "safe_update_delete_evidence.csv", index=False)
+
+    schema = """
+DROP TABLE IF EXISTS ipc_cleaned;
+DROP TABLE IF EXISTS ipc_phase_distribution;
+DROP TABLE IF EXISTS severe_food_insecurity;
+DROP TABLE IF EXISTS ipc_phase_summary;
+
+-- Tables are populated by the Python pipeline from cleaned CSV/DataFrame outputs.
+-- The schema below documents the table purpose and key analytical fields.
+CREATE TABLE ipc_cleaned (
+    ref_area TEXT,
+    ref_area_label TEXT,
+    indicator TEXT,
+    indicator_label TEXT,
+    unit_measure TEXT,
+    unit_measure_label TEXT,
+    unit_type TEXT,
+    unit_type_label TEXT,
+    comp_breakdown_1_label TEXT,
+    comp_breakdown_2 TEXT,
+    comp_breakdown_2_label TEXT,
+    time_period TEXT,
+    obs_value REAL,
+    obs_status_label TEXT,
+    obs_conf_label TEXT,
+    period TEXT,
+    year INTEGER,
+    month INTEGER,
+    phase TEXT,
+    metric TEXT,
+    obs_value_filled REAL
+);
+
+CREATE TABLE severe_food_insecurity (
+    ref_area TEXT,
+    ref_area_label TEXT,
+    indicator TEXT,
+    indicator_label TEXT,
+    unit_measure TEXT,
+    unit_measure_label TEXT,
+    unit_type TEXT,
+    unit_type_label TEXT,
+    time_period INTEGER,
+    obs_value REAL,
+    obs_status_label TEXT,
+    obs_conf_label TEXT,
+    year INTEGER,
+    year_on_year_change_percentage_points REAL,
+    rolling_3_year_average REAL
+);
+""".strip()
+    (DATABASE_DIR / "schema.sql").write_text(schema, encoding="utf-8")
+
+    queries = """
+-- 1. Severe food insecurity trend by year.
+SELECT year, obs_value AS severe_food_insecurity_percent, year_on_year_change_percentage_points
+FROM severe_food_insecurity
+ORDER BY year;
+
+-- 2. IPC phase distribution ranked by population share.
+SELECT phase, people, percentage
+FROM ipc_phase_summary
+ORDER BY percentage DESC;
+
+-- 3. Crisis-or-worse population count from Phase 3, Phase 4, and Phase 5.
+SELECT SUM(people) AS crisis_or_worse_people
+FROM ipc_phase_summary
+WHERE phase IN ('Phase 3 - Crisis', 'Phase 4 - Emergency', 'Phase 5 - Famine');
+
+-- 4. Safe UPDATE example for a copied/demo table.
+CREATE TABLE IF NOT EXISTS severe_food_insecurity_demo AS
+SELECT * FROM severe_food_insecurity;
+UPDATE severe_food_insecurity_demo
+SET obs_status_label = 'Reviewed for project'
+WHERE year = 2023;
+
+-- 5. Safe DELETE example targeting invalid records only.
+DELETE FROM severe_food_insecurity_demo
+WHERE year IS NULL;
+""".strip()
+    (DATABASE_DIR / "queries.sql").write_text(queries, encoding="utf-8")
+
+    notes = [
+        "DATABASE INTEGRATION EVIDENCE",
+        "",
+        "- food_security.db is a SQLite database generated from the cleaned project outputs.",
+        "- schema.sql documents the analytical tables.",
+        "- queries.sql contains SELECT queries plus safe UPDATE and DELETE examples using WHERE clauses.",
+        "- query_result_*.csv files are exported query outputs for report evidence.",
+        "- safe_update_delete_evidence.csv explains the update/delete safety controls.",
+    ]
+    (DATABASE_DIR / "database_evidence_notes.txt").write_text("\n".join(notes), encoding="utf-8")
+
+
+def report_sections(svfi_zaf: pd.DataFrame, phase_summary: pd.DataFrame) -> list[tuple[str, list[str]]]:
+    start_year = int(svfi_zaf.iloc[0]["year"])
+    end_year = int(svfi_zaf.iloc[-1]["year"])
+    start_value = float(svfi_zaf.iloc[0]["obs_value"])
+    end_value = float(svfi_zaf.iloc[-1]["obs_value"])
+    p3plus = phase_summary.loc[
+        phase_summary["phase"].isin(["Phase 3 - Crisis", "Phase 4 - Emergency", "Phase 5 - Famine"]),
+        "people",
+    ].sum()
+    p3plus_pct = phase_summary.loc[
+        phase_summary["phase"].isin(["Phase 3 - Crisis", "Phase 4 - Emergency", "Phase 5 - Famine"]),
+        "percentage",
+    ].sum()
+
+    return [
+        (
+            "Executive Summary",
+            [
+                "This project analyses South African food-security conditions using two World Bank Data360 datasets: the Integrated Food Security Phase Classification (IPC) and the World Development Indicators severe food insecurity prevalence series.",
+                f"The main finding is that severe food insecurity prevalence rose from {start_value:.1f}% in {start_year} to {end_value:.1f}% in {end_year}. The IPC 2020-10 snapshot also shows {p3plus:,.0f} people, or {p3plus_pct:.1f}% of the classified population, in Phase 3 or above.",
+                "Together, the datasets describe both a multi-year trend and a detailed severity distribution. The trend suggests worsening pressure over time, while the IPC snapshot clarifies how many people fall into each food insecurity phase.",
+            ],
+        ),
+        (
+            "Data Sources and Scope",
+            [
+                "The IPC dataset contains monthly classification records by country, indicator, unit, phase, and time period. For this project it was filtered to South Africa records only.",
+                "The severe food insecurity prevalence dataset contains annual World Development Indicators observations. For South Africa, the available records cover 2018 to 2023.",
+                "The raw CSV files were preserved unchanged in the Raw datasets folder. All cleaning, transformations, and outputs were written to separate project folders for auditability.",
+            ],
+        ),
+        (
+            "Data Preparation",
+            [
+                "Column names were normalised into lowercase snake_case fields. South Africa was selected using REF_AREA = ZAF or REF_AREA_LABEL = South Africa.",
+                "Numeric observation values were converted with explicit coercion, time periods were parsed into year/month fields, and IPC phase labels were extracted into readable phase names.",
+                "The IPC Phase 5 records contain missing values for both people and percentage. These missing values remain visible in the cleaned file, while numeric summaries use a filled value of zero only where totals require arithmetic.",
+            ],
+        ),
+        (
+            "Numerical Analysis",
+            [
+                f"The severe food insecurity average across the available period is {svfi_zaf['obs_value'].mean():.2f}%. The minimum is {svfi_zaf['obs_value'].min():.1f}% and the maximum is {svfi_zaf['obs_value'].max():.1f}%.",
+                f"The total change over the observed period is {end_value - start_value:.1f} percentage points. Year-on-year changes are exported in the Numeric Analysis folder.",
+                f"The IPC distribution shows Phase 1 and Phase 2 as the largest groups, but Phase 3 and Phase 4 still account for {p3plus:,.0f} people in crisis-or-worse conditions.",
+            ],
+        ),
+        (
+            "Database Integration",
+            [
+                "A SQLite database named food_security.db was generated from the cleaned datasets. It includes tables for cleaned IPC records, IPC phase distribution, severe food insecurity trend data, and summarised IPC phase results.",
+                "The database folder includes schema.sql, queries.sql, exported SELECT query results, and safe UPDATE/DELETE examples. The update and delete examples use WHERE clauses and are intended for a copied demo table.",
+                "This demonstrates that the cleaned data can be stored, queried, modified safely, and exported for reporting or visualisation.",
+            ],
+        ),
+        (
+            "Visualisation",
+            [
+                "The visualisation folder contains a severe food insecurity trend line chart, IPC phase distribution charts by people and percentage, and a combined dashboard.",
+                "The charts use clear titles, axis labels, units, value labels, and consistent colours. They are designed for direct use in the final report and class demonstration.",
+                "The trend line makes the rise from 2018 to 2023 visible, while the IPC bars show the population scale of each classification phase.",
+            ],
+        ),
+        (
+            "Conclusion and Recommendations",
+            [
+                "South Africa's severe food insecurity prevalence increased across the observed WDI series, ending at its highest available value in 2023.",
+                "Policy and programme discussion should focus on the Phase 3 and Phase 4 population groups because they represent people already experiencing crisis or emergency conditions in the IPC framework.",
+                "Recommended next steps are to add household-level or provincial data if available, compare South Africa against regional benchmarks, and update the analysis when newer WDI or IPC observations become available.",
+            ],
+        ),
+    ]
+
+
+def write_report_markdown(sections: list[tuple[str, list[str]]]) -> None:
+    lines = [
+        "# NDTA631 Food Security Data Analysis and Visualisation Report",
+        "",
+        "Topic: South African food security and severe food insecurity",
+        "",
+        "Prepared for: NDTA631 Data Analysis and Visualisation Group Assignment 2026",
+        "",
+        "Note: Add group member names and student numbers before final submission.",
+        "",
+    ]
+    for heading, paragraphs in sections:
+        lines.append(f"## {heading}")
+        lines.extend([""])
+        for paragraph in paragraphs:
+            lines.extend([paragraph, ""])
+    lines.extend(
+        [
+            "## Report Figures",
+            "",
+            "- Visualisation/severe_food_insecurity_trend.png",
+            "- Visualisation/ipc_phase_distribution_people.png",
+            "- Visualisation/ipc_phase_distribution_percentage.png",
+            "- Visualisation/food_security_overview_dashboard.png",
+            "",
+            "## Repository Evidence",
+            "",
+            "- Data Preparation: cleaned CSV files, descriptive statistics, and data quality notes.",
+            "- Numeric Analysis: NumPy-driven summary tables and numerical findings.",
+            "- Python or Excel Data Analysis: reusable Python pipeline and Excel workbook.",
+            "- Database Integration: SQLite database, schema, queries, and exported query results.",
+            "- Visualisation: final PNG charts and chart explanations.",
+        ]
+    )
+    (REPORT_DIR / "NDTA631_Group_Report.md").write_text("\n".join(lines), encoding="utf-8")
+
+
+def docx_paragraph(text: str, style: str | None = None) -> str:
+    style_xml = f'<w:pStyle w:val="{style}"/>' if style else ""
+    return (
+        "<w:p><w:pPr>"
+        f"{style_xml}"
+        "</w:pPr><w:r><w:t xml:space=\"preserve\">"
+        f"{escape(text)}"
+        "</w:t></w:r></w:p>"
+    )
+
+
+def docx_image(rel_id: str, width_emu: int = 5486400, height_emu: int = 3200400) -> str:
+    return f"""
+<w:p>
+  <w:r>
+    <w:drawing>
+      <wp:inline distT="0" distB="0" distL="0" distR="0" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing">
+        <wp:extent cx="{width_emu}" cy="{height_emu}"/>
+        <wp:docPr id="1" name="Project chart"/>
+        <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+          <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
+            <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
+              <pic:nvPicPr><pic:cNvPr id="0" name="chart.png"/><pic:cNvPicPr/></pic:nvPicPr>
+              <pic:blipFill><a:blip r:embed="{rel_id}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>
+              <pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{width_emu}" cy="{height_emu}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr>
+            </pic:pic>
+          </a:graphicData>
+        </a:graphic>
+      </wp:inline>
+    </w:drawing>
+  </w:r>
+</w:p>
+""".strip()
+
+
+def write_docx_report(sections: list[tuple[str, list[str]]]) -> None:
+    chart_files = [
+        VIS_DIR / "severe_food_insecurity_trend.png",
+        VIS_DIR / "ipc_phase_distribution_people.png",
+        VIS_DIR / "ipc_phase_distribution_percentage.png",
+        VIS_DIR / "food_security_overview_dashboard.png",
+    ]
+
+    body = [
+        docx_paragraph("NDTA631 Food Security Data Analysis and Visualisation Report", "Title"),
+        docx_paragraph("South African food security and severe food insecurity", "Subtitle"),
+        docx_paragraph("Prepared for NDTA631 Group Assignment 2026"),
+        docx_paragraph("Add group member names and student numbers before final submission."),
+    ]
+    for heading, paragraphs in sections:
+        body.append(docx_paragraph(heading, "Heading1"))
+        body.extend(docx_paragraph(paragraph) for paragraph in paragraphs)
+    body.append(docx_paragraph("Report Figures", "Heading1"))
+    for index, image_path in enumerate(chart_files, start=1):
+        if image_path.exists():
+            body.append(docx_paragraph(image_path.name, "Heading2"))
+            body.append(docx_image(f"rId{index + 1}"))
+
+    document_xml = f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas"
+xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"
+xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing"
+xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+xmlns:w10="urn:schemas-microsoft-com:office:word"
+xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml"
+xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup"
+xmlns:wpi="http://schemas.microsoft.com/office/word/2010/wordprocessingInk"
+xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml"
+xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape"
+mc:Ignorable="w14 wp14"><w:body>{''.join(body)}<w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720"/></w:sectPr></w:body></w:document>"""
+
+    relationships = [
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">',
+        '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>',
+    ]
+    for index, image_path in enumerate(chart_files, start=1):
+        if image_path.exists():
+            relationships.append(
+                f'<Relationship Id="rId{index + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/{image_path.name}"/>'
+            )
+    relationships.append("</Relationships>")
+
+    styles_xml = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:rPr><w:sz w:val="22"/></w:rPr></w:style>
+<w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:rPr><w:b/><w:sz w:val="34"/></w:rPr></w:style>
+<w:style w:type="paragraph" w:styleId="Subtitle"><w:name w:val="Subtitle"/><w:rPr><w:i/><w:sz w:val="24"/></w:rPr></w:style>
+<w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/><w:rPr><w:b/><w:sz w:val="28"/></w:rPr></w:style>
+<w:style w:type="paragraph" w:styleId="Heading2"><w:name w:val="heading 2"/><w:rPr><w:b/><w:sz w:val="24"/></w:rPr></w:style>
+</w:styles>"""
+
+    content_types = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+<Default Extension="xml" ContentType="application/xml"/>
+<Default Extension="png" ContentType="image/png"/>
+<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+</Types>"""
+
+    package_rels = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>"""
+
+    with ZipFile(REPORT_DIR / "NDTA631_Group_Report.docx", "w", ZIP_DEFLATED) as docx:
+        docx.writestr("[Content_Types].xml", content_types)
+        docx.writestr("_rels/.rels", package_rels)
+        docx.writestr("word/document.xml", document_xml)
+        docx.writestr("word/styles.xml", styles_xml)
+        docx.writestr("word/_rels/document.xml.rels", "\n".join(relationships))
+        for image_path in chart_files:
+            if image_path.exists():
+                docx.write(image_path, f"word/media/{image_path.name}")
+
+
+def add_pdf_text_page(pdf: PdfPages, title: str, paragraphs: list[str]) -> None:
+    fig = plt.figure(figsize=(8.27, 11.69))
+    fig.patch.set_facecolor("white")
+    y = 0.94
+    fig.text(0.08, y, title, fontsize=16, weight="bold", va="top")
+    y -= 0.05
+    for paragraph in paragraphs:
+        for line in wrap(paragraph, width=88):
+            fig.text(0.08, y, line, fontsize=10.5, va="top")
+            y -= 0.023
+        y -= 0.018
+        if y < 0.08:
+            pdf.savefig(fig, bbox_inches="tight")
+            plt.close(fig)
+            fig = plt.figure(figsize=(8.27, 11.69))
+            fig.patch.set_facecolor("white")
+            y = 0.94
+    pdf.savefig(fig, bbox_inches="tight")
+    plt.close(fig)
+
+
+def write_pdf_report(sections: list[tuple[str, list[str]]]) -> None:
+    chart_files = [
+        VIS_DIR / "severe_food_insecurity_trend.png",
+        VIS_DIR / "ipc_phase_distribution_people.png",
+        VIS_DIR / "ipc_phase_distribution_percentage.png",
+        VIS_DIR / "food_security_overview_dashboard.png",
+    ]
+    with PdfPages(REPORT_DIR / "NDTA631_Group_Report.pdf") as pdf:
+        add_pdf_text_page(
+            pdf,
+            "NDTA631 Food Security Data Analysis and Visualisation Report",
+            [
+                "South African food security and severe food insecurity.",
+                "Prepared for NDTA631 Group Assignment 2026.",
+                "Add group member names and student numbers before final submission.",
+            ],
+        )
+        for heading, paragraphs in sections:
+            add_pdf_text_page(pdf, heading, paragraphs)
+        for image_path in chart_files:
+            if image_path.exists():
+                image = plt.imread(image_path)
+                fig, ax = plt.subplots(figsize=(11.69, 8.27))
+                ax.imshow(image)
+                ax.axis("off")
+                fig.suptitle(image_path.name, fontsize=14, weight="bold")
+                pdf.savefig(fig, bbox_inches="tight")
+                plt.close(fig)
+
+
+def write_demo_materials(sections: list[tuple[str, list[str]]]) -> None:
+    script = [
+        "NDTA631 PROJECT DEMO SCRIPT",
+        "",
+        "1. Open README.md and explain the project question, folder structure, and data source.",
+        "2. Show the raw datasets folder and state that the original CSV files were preserved unchanged.",
+        "3. Run: python \"Python or Excel Data Analysis\\food_security_pipeline.py\"",
+        "4. Open Data Preparation outputs and explain South Africa filtering, missing values, and cleaned files.",
+        "5. Open Numeric Analysis outputs and explain the severe food insecurity trend and IPC Phase 3+ result.",
+        "6. Open Database Integration/food_security.db or the exported query CSV files, then explain schema.sql and queries.sql.",
+        "7. Open the Visualisation folder and discuss the trend chart, IPC phase charts, and dashboard.",
+        "8. Open Report & Demo/NDTA631_Group_Report.pdf and use it as the final story for the audience.",
+        "",
+        "Key talking point:",
+        sections[0][1][1],
+    ]
+    (REPORT_DIR / "demo_script.txt").write_text("\n".join(script), encoding="utf-8")
+
+    checklist = [
+        "FINAL SUBMISSION CHECKLIST",
+        "",
+        "[ ] Add group member names and student numbers to the DOCX/PDF.",
+        "[x] Raw datasets preserved unchanged.",
+        "[x] Cleaned South Africa datasets created.",
+        "[x] Missing values and cleaning decisions documented.",
+        "[x] NumPy/Pandas numerical analysis completed.",
+        "[x] Excel workbook created with analysis tables and charts.",
+        "[x] SQLite database, schema, queries, and query results created.",
+        "[x] Visualisations exported as PNG files.",
+        "[x] Report draft generated in Markdown, DOCX, and PDF.",
+        "[x] Demo script prepared.",
+    ]
+    (REPORT_DIR / "final_submission_checklist.txt").write_text("\n".join(checklist), encoding="utf-8")
+
+
+def write_report_outputs(svfi_zaf: pd.DataFrame, phase_summary: pd.DataFrame) -> None:
+    sections = report_sections(svfi_zaf, phase_summary)
+    write_report_markdown(sections)
+    write_docx_report(sections)
+    write_pdf_report(sections)
+    write_demo_materials(sections)
+
+
 def save_visualisations(svfi_zaf: pd.DataFrame, phase_summary: pd.DataFrame) -> None:
     sns.set_theme(style="whitegrid", palette="Set2")
     plt.rcParams["figure.dpi"] = 140
@@ -393,7 +943,10 @@ def main() -> None:
     write_data_preparation_outputs(ipc_zaf, ipc_phases, svfi_zaf)
     phase_summary = write_numeric_outputs(ipc_phases, p3plus, svfi_zaf)
     write_analysis_summary(svfi_zaf, phase_summary)
+    write_excel_workbook(svfi_zaf, phase_summary)
+    write_database_outputs(ipc_zaf, ipc_phases, svfi_zaf, phase_summary)
     save_visualisations(svfi_zaf, phase_summary)
+    write_report_outputs(svfi_zaf, phase_summary)
     print("Food security analysis pipeline completed successfully.")
 
 

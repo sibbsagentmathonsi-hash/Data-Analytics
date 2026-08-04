@@ -1,0 +1,7 @@
+DATABASE INTEGRATION EVIDENCE
+
+- food_security.db is a SQLite database generated from the cleaned project outputs.
+- schema.sql documents the analytical tables.
+- queries.sql contains SELECT queries plus safe UPDATE and DELETE examples using WHERE clauses.
+- query_result_*.csv files are exported query outputs for report evidence.
+- safe_update_delete_evidence.csv explains the update/delete safety controls.

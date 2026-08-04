@@ -1,0 +1,12 @@
+FINAL SUBMISSION CHECKLIST
+
+[ ] Add group member names and student numbers to the DOCX/PDF.
+[x] Raw datasets preserved unchanged.
+[x] Cleaned South Africa datasets created.
+[x] Missing values and cleaning decisions documented.
+[x] NumPy/Pandas numerical analysis completed.
+[x] Excel workbook created with analysis tables and charts.
+[x] SQLite database, schema, queries, and query results created.
+[x] Visualisations exported as PNG files.
+[x] Report draft generated in Markdown, DOCX, and PDF.
+[x] Demo script prepared.

@@ -1,0 +1,3 @@
+operation,sql_pattern,safety_note
+UPDATE demonstration,UPDATE severe_food_insecurity SET obs_status_label = 'Reviewed for project' WHERE year = 2023;,Uses a WHERE clause and should be run only in a copied/demo table for assessment evidence.
+DELETE demonstration,DELETE FROM severe_food_insecurity WHERE year IS NULL;,Uses a WHERE clause that targets invalid rows only; no valid rows in this project match it.

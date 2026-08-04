@@ -1,0 +1,13 @@
+NDTA631 PROJECT DEMO SCRIPT
+
+1. Open README.md and explain the project question, folder structure, and data source.
+2. Show the raw datasets folder and state that the original CSV files were preserved unchanged.
+3. Run: python "Python or Excel Data Analysis\food_security_pipeline.py"
+4. Open Data Preparation outputs and explain South Africa filtering, missing values, and cleaned files.
+5. Open Numeric Analysis outputs and explain the severe food insecurity trend and IPC Phase 3+ result.
+6. Open Database Integration/food_security.db or the exported query CSV files, then explain schema.sql and queries.sql.
+7. Open the Visualisation folder and discuss the trend chart, IPC phase charts, and dashboard.
+8. Open Report & Demo/NDTA631_Group_Report.pdf and use it as the final story for the audience.
+
+Key talking point:
+The main finding is that severe food insecurity prevalence rose from 6.9% in 2018 to 8.5% in 2023. The IPC 2020-10 snapshot also shows 9,335,159 people, or 16.0% of the classified population, in Phase 3 or above.

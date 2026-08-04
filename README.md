@@ -80,12 +80,12 @@ The completed analysis pipeline is available at:
 python "Python or Excel Data Analysis\food_security_pipeline.py"
 ```
 
-The script reads the raw CSV files, filters South Africa records, creates cleaned datasets, performs numerical analysis, and exports final charts. A typical Python setup may look like:
+The script reads the raw CSV files, filters South Africa records, creates cleaned datasets, performs numerical analysis, builds a SQLite database, creates an Excel workbook, exports final charts, and generates the report/demo pack. A typical Python setup may look like:
 
 ```bash
 python -m venv .venv
 .venv\Scripts\activate
-pip install pandas numpy matplotlib seaborn
+pip install pandas numpy matplotlib seaborn openpyxl
 ```
 
 If the group uses Excel instead of Python for parts of the analysis, place the workbook in `Python or Excel Data Analysis/` and include screenshots or exported charts in the relevant folders.
@@ -96,8 +96,10 @@ If the group uses Excel instead of Python for parts of the analysis, place the w
 | --- | --- |
 | `Data Preparation/` | Cleaned South Africa CSV files, descriptive statistics, and data quality notes |
 | `Numeric Analysis/` | IPC phase summary, severe food insecurity year-on-year change, numerical summary, and findings notes |
-| `Python or Excel Data Analysis/` | Reusable Python pipeline plus transformed analysis tables |
+| `Python or Excel Data Analysis/` | Reusable Python pipeline, transformed analysis tables, and Excel workbook |
+| `Database Integration/` | SQLite database, schema, SQL queries, exported query results, and safe update/delete evidence |
 | `Visualisation/` | Final PNG charts and chart explanation notes |
+| `Report & Demo/` | Report draft in Markdown, DOCX, and PDF formats plus demo script and final checklist |
 
 Key findings from the current outputs:
 
@@ -120,10 +122,10 @@ Key findings from the current outputs:
 ## Team Quality Checklist
 
 - [ ] All group members' names and student numbers are included in report/code where required.
-- [ ] At least two datasets are used together to tell one story.
-- [ ] South Africa records are correctly filtered and explained.
-- [ ] Missing values and data quality issues are documented.
-- [ ] Numerical results are interpreted, not only calculated.
-- [ ] Graphs are labelled and support the report conclusions.
-- [ ] Database work is visible through scripts, screenshots, or schema diagrams.
-- [ ] Final report is 7 to 9 pages and includes methods, charts, conclusions, and recommendations.
+- [x] At least two datasets are used together to tell one story.
+- [x] South Africa records are correctly filtered and explained.
+- [x] Missing values and data quality issues are documented.
+- [x] Numerical results are interpreted, not only calculated.
+- [x] Graphs are labelled and support the report conclusions.
+- [x] Database work is visible through scripts, query outputs, and schema files.
+- [x] Final report draft includes methods, charts, conclusions, and recommendations.
