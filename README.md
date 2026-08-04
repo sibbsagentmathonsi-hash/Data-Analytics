@@ -74,7 +74,13 @@ The final submission should include:
 
 ## Running the Project
 
-Add the final scripts or notebooks as the analysis develops. A typical Python setup may look like:
+The completed analysis pipeline is available at:
+
+```bash
+python "Python or Excel Data Analysis\food_security_pipeline.py"
+```
+
+The script reads the raw CSV files, filters South Africa records, creates cleaned datasets, performs numerical analysis, and exports final charts. A typical Python setup may look like:
 
 ```bash
 python -m venv .venv
@@ -83,6 +89,22 @@ pip install pandas numpy matplotlib seaborn
 ```
 
 If the group uses Excel instead of Python for parts of the analysis, place the workbook in `Python or Excel Data Analysis/` and include screenshots or exported charts in the relevant folders.
+
+## Completed Outputs
+
+| Folder | Output |
+| --- | --- |
+| `Data Preparation/` | Cleaned South Africa CSV files, descriptive statistics, and data quality notes |
+| `Numeric Analysis/` | IPC phase summary, severe food insecurity year-on-year change, numerical summary, and findings notes |
+| `Python or Excel Data Analysis/` | Reusable Python pipeline plus transformed analysis tables |
+| `Visualisation/` | Final PNG charts and chart explanation notes |
+
+Key findings from the current outputs:
+
+- Severe food insecurity prevalence increased from 6.9% in 2018 to 8.5% in 2023.
+- The average severe food insecurity prevalence across the available years is 7.95%.
+- In the IPC 2020-10 snapshot, 9,335,159 people were in Phase 3 or above.
+- IPC Phase 3 or above represents 16.0% of the classified South African population in the available snapshot.
 
 ## Marking Alignment
 

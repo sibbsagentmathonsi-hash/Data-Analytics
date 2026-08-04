@@ -1,0 +1,16 @@
+DATA QUALITY NOTES
+
+Scope:
+- Both raw datasets were filtered to South Africa using REF_AREA = ZAF or REF_AREA_LABEL = South Africa.
+- Raw files were not edited. Cleaned outputs were saved in the Data Preparation folder.
+
+Integrated Food Security Phase Classification:
+- South Africa rows retained: 12.
+- Missing OBS_VALUE entries: 2.
+- Missing IPC Phase 5 values were kept in the cleaned file and treated as 0 only in numeric summaries where a total is required.
+- The IPC dataset provides a snapshot for 2020-10, including counts and percentages by phase.
+
+Severe food insecurity prevalence:
+- South Africa rows retained: 6.
+- Missing OBS_VALUE entries: 0.
+- Values are percentages and cover the available years in the raw dataset.

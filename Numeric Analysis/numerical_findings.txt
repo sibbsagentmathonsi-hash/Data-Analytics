@@ -1,0 +1,8 @@
+NUMERICAL FINDINGS
+
+- The severe food insecurity prevalence series runs from 2018 to 2023.
+- Prevalence increased from 6.9% in 2018 to 8.5% in 2023, a change of 1.6 percentage points.
+- The highest severe food insecurity prevalence in the available data is 8.5%.
+- The average severe food insecurity prevalence is 7.95%.
+- In the IPC 2020-10 snapshot, 9,335,159 people were in Phase 3 or above, equal to 16.0% of the classified population.
+- The phase rows calculate 9,335,159 people in crisis-or-worse phases when missing Phase 5 values are treated as 0.

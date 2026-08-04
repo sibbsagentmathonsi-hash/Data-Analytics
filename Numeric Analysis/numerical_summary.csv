@@ -1,0 +1,9 @@
+metric,value,unit
+"IPC total classified population, 2020-10",59130437.0,people
+"IPC people in Phase 3 or above, 2020-10",9335159.0,people
+"IPC percentage in Phase 3 or above, 2020-10",16.0,percent
+Calculated crisis-or-worse people from phase rows,9335159.0,people
+Severe food insecurity prevalence average,7.95,percent
+Severe food insecurity prevalence minimum,6.9,percent
+Severe food insecurity prevalence maximum,8.5,percent
+Severe food insecurity total change,1.6,percentage points
