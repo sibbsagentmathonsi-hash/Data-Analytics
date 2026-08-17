@@ -4,12 +4,12 @@ Professional, reproducible analysis of South African food-security indicators fo
 
 ## Group Members
 
-1. Sibusiso Agent Mathonsi 202331971
-2. Kegoikantse Sebetseba 202414220
-3. Agcobile Qabo 202469432
-4. Lebogang Malatjie 202404978
-5. Tlotlo Naledi 202422544
-6. Tlotlanang Naledi 202422539
+1. Sibusiso Agent Mathonsi
+2. Kegoikantse Sebetseba
+3. Agcobile Qabo
+4. Lebogang Malatjie
+5. Tlotlo Naledi
+6. Tlotlanang Naledi
 
 ## Stakeholder-ready deliverables
 
