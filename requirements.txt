@@ -1,0 +1,7 @@
+# Runtime dependencies for Python or Excel Data Analysis/food_security_pipeline.py
+# Tested in the project environment with Python 3.14.6.
+numpy==2.4.6
+pandas==3.0.3
+matplotlib==3.11.0
+seaborn==0.13.2
+openpyxl==3.1.5

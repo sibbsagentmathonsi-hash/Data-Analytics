@@ -7,10 +7,12 @@ Scope:
 Integrated Food Security Phase Classification:
 - South Africa rows retained: 12.
 - Missing OBS_VALUE entries: 2.
-- Missing IPC Phase 5 values were kept in the cleaned file and treated as 0 only in numeric summaries where a total is required.
+- Missing IPC Phase 5 values were kept as missing in the cleaned file and summary tables.
+- Phase 5 is labelled Not reported in stakeholder outputs; it is not converted to 0.
 - The IPC dataset provides a snapshot for 2020-10, including counts and percentages by phase.
 
 Severe food insecurity prevalence:
 - South Africa rows retained: 6.
 - Missing OBS_VALUE entries: 0.
 - Values are percentages and cover the available years in the raw dataset.
+- The 3-year rolling average is published from 2020 onward; 2018 and 2019 remain blank because fewer than three observations are available.

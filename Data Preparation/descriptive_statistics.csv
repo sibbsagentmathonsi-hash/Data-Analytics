@@ -1,3 +1,4 @@
-dataset,raw_rows_for_south_africa,missing_obs_values,minimum_obs_value,maximum_obs_value,mean_obs_value
-Integrated Food Security Phase Classification,12,2,2.0,34950493.0,6846571.2
-Severe food insecurity prevalence,6,0,6.9,8.5,7.949999999999999
+dataset,unit,raw_rows_for_south_africa,missing_obs_values,minimum_obs_value,maximum_obs_value,mean_obs_value
+Integrated Food Security Phase Classification,people,6,1,1160087.0,34950493.0,13693119.2
+Integrated Food Security Phase Classification,percent,6,1,2.0,59.0,23.2
+Severe food insecurity prevalence,percent,6,0,6.9,8.5,7.95

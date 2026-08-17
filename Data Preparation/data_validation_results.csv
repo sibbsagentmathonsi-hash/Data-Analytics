@@ -1,0 +1,7 @@
+control,result,status
+Country filter,12 IPC rows; 6 SVFI rows,pass
+IPC period type,2020-10,pass
+Annual period type,2018-2023,pass
+Missingness and status,2 missing IPC values; 2 Phase 5 missing values,pass
+Reported phase totals,"59,130,437 people; 100.0%",pass
+P3+ source rows,Source-reported people and percentage records present,pass

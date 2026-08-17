@@ -1,7 +1,7 @@
 ref_area,ref_area_label,indicator,indicator_label,unit_measure,unit_measure_label,unit_type,unit_type_label,time_period,obs_value,obs_status_label,obs_conf_label,year,year_on_year_change_percentage_points,rolling_3_year_average
-ZAF,South Africa,WB_WDI_SN_ITK_SVFI_ZS,Prevalence of severe food insecurity in the population (%),PT,Percentage,RATIO,Ratio,2018,6.9,Normal value,Public,2018,,6.9
-ZAF,South Africa,WB_WDI_SN_ITK_SVFI_ZS,Prevalence of severe food insecurity in the population (%),PT,Percentage,RATIO,Ratio,2019,7.5,Normal value,Public,2019,0.5999999999999996,7.2
-ZAF,South Africa,WB_WDI_SN_ITK_SVFI_ZS,Prevalence of severe food insecurity in the population (%),PT,Percentage,RATIO,Ratio,2020,8.0,Normal value,Public,2020,0.5,7.466666666666666
-ZAF,South Africa,WB_WDI_SN_ITK_SVFI_ZS,Prevalence of severe food insecurity in the population (%),PT,Percentage,RATIO,Ratio,2021,8.4,Normal value,Public,2021,0.40000000000000036,7.966666666666666
-ZAF,South Africa,WB_WDI_SN_ITK_SVFI_ZS,Prevalence of severe food insecurity in the population (%),PT,Percentage,RATIO,Ratio,2022,8.4,Normal value,Public,2022,0.0,8.266666666666667
-ZAF,South Africa,WB_WDI_SN_ITK_SVFI_ZS,Prevalence of severe food insecurity in the population (%),PT,Percentage,RATIO,Ratio,2023,8.5,Normal value,Public,2023,0.09999999999999964,8.433333333333334
+ZAF,South Africa,WB_WDI_SN_ITK_SVFI_ZS,Prevalence of severe food insecurity in the population (%),PT,Percentage,RATIO,Ratio,2018,6.9,Normal value,Public,2018,,
+ZAF,South Africa,WB_WDI_SN_ITK_SVFI_ZS,Prevalence of severe food insecurity in the population (%),PT,Percentage,RATIO,Ratio,2019,7.5,Normal value,Public,2019,0.6,
+ZAF,South Africa,WB_WDI_SN_ITK_SVFI_ZS,Prevalence of severe food insecurity in the population (%),PT,Percentage,RATIO,Ratio,2020,8.0,Normal value,Public,2020,0.5,7.47
+ZAF,South Africa,WB_WDI_SN_ITK_SVFI_ZS,Prevalence of severe food insecurity in the population (%),PT,Percentage,RATIO,Ratio,2021,8.4,Normal value,Public,2021,0.4,7.97
+ZAF,South Africa,WB_WDI_SN_ITK_SVFI_ZS,Prevalence of severe food insecurity in the population (%),PT,Percentage,RATIO,Ratio,2022,8.4,Normal value,Public,2022,0.0,8.27
+ZAF,South Africa,WB_WDI_SN_ITK_SVFI_ZS,Prevalence of severe food insecurity in the population (%),PT,Percentage,RATIO,Ratio,2023,8.5,Normal value,Public,2023,0.1,8.43

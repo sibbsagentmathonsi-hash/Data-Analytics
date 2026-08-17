@@ -1,5 +1,13 @@
 NDTA631 PROJECT DEMO SCRIPT
 
+Group Members:
+1. Sibusiso Agent Mathonsi 202331971
+2. Kegoikantse Sebetseba 202414220
+3. Agcobile Qabo 202469432
+4. Lebogang Malatjie 202404978
+5. Tlotlo Naledi 202422544
+6. Tlotlanang Naledi 202422539
+
 1. Open README.md and explain the project question, folder structure, and data source.
 2. Show the raw datasets folder and state that the original CSV files were preserved unchanged.
 3. Run: python "Python or Excel Data Analysis\food_security_pipeline.py"

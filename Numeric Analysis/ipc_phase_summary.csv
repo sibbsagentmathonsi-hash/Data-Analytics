@@ -1,6 +1,6 @@
-phase,people,percentage
-Phase 1 - Minimal,34950493.0,59.0
-Phase 2 - Stressed,14844785.0,25.0
-Phase 3 - Crisis,8175072.0,14.0
-Phase 4 - Emergency,1160087.0,2.0
-Phase 5 - Famine,0.0,0.0
+phase,phase_order,people,people_status,percentage,percentage_status,reporting_treatment,people_display,percentage_display
+Phase 1 - Minimal,1.0,34950493.0,Normal value,59.0,Normal value,Reported,"34,950,493",59.0%
+Phase 2 - Stressed,2.0,14844785.0,Normal value,25.0,Normal value,Reported,"14,844,785",25.0%
+Phase 3 - Crisis,3.0,8175072.0,Normal value,14.0,Normal value,Reported,"8,175,072",14.0%
+Phase 4 - Emergency,4.0,1160087.0,Normal value,2.0,Normal value,Reported,"1,160,087",2.0%
+Phase 5 - Famine,5.0,,Missing value,,Missing value,Not reported in source,Not reported,Not reported

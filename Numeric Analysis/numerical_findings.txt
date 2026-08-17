@@ -1,8 +1,13 @@
 NUMERICAL FINDINGS
 
-- The severe food insecurity prevalence series runs from 2018 to 2023.
-- Prevalence increased from 6.9% in 2018 to 8.5% in 2023, a change of 1.6 percentage points.
-- The highest severe food insecurity prevalence in the available data is 8.5%.
-- The average severe food insecurity prevalence is 7.95%.
-- In the IPC 2020-10 snapshot, 9,335,159 people were in Phase 3 or above, equal to 16.0% of the classified population.
-- The phase rows calculate 9,335,159 people in crisis-or-worse phases when missing Phase 5 values are treated as 0.
+- Loaded the cleaned severe food insecurity and IPC datasets from the Data Preparation folder, then converted years, prevalence values, IPC people counts, and IPC percentages into NumPy arrays.
+- The severe food insecurity prevalence array covers 2018 to 2023 and contains 6 yearly observations.
+- Prevalence increased from 6.9% in 2018 to 8.5% in 2023, a total change of 1.6 percentage points, or 23.19% relative to the first year.
+- Across the severe food insecurity series, the NumPy average is 7.95%, the minimum is 6.9%, the maximum is 8.5%, and the range is 1.6 percentage points.
+- The largest year-on-year increase is 0.6 percentage points from 2018 to 2019; the smallest increase is 0.0 percentage points from 2021 to 2022.
+- Reshaping the six-year prevalence array into two 3-year periods gives a 2018-2020 average of 7.47% and a 2021-2023 average of 8.43%, so the later period is 0.97 percentage points higher.
+- In the IPC 2020-10 snapshot, NumPy sums show 59,130,437 people across reported phase rows and 100.0% across reported phase percentages.
+- The source-reported Phase 3 or above KPI is 9,335,159 people, equal to 16.0% of the classified population; the Phase 3 and Phase 4 rows sum to the same people count because Phase 5 is missing in the supplied phase rows.
+- Phase 1 and Phase 2 account for 49,795,278 people, or 84.0%, meaning most classified people were outside crisis-or-worse phases in the IPC snapshot, while 16.0% were still in serious acute food insecurity.
+- The IPC phase metric matrix was reshaped to 2 rows by 5 columns: one row for people and one row for percentages across the five IPC phases.
+- Phase 5 values are retained as missing values, not treated as zero, because the cleaned source labels them as missing.

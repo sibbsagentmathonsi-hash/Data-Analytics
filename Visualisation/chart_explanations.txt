@@ -6,11 +6,11 @@ severe_food_insecurity_trend.png:
 
 ipc_phase_distribution_people.png:
 - Shows the number of people in each IPC phase in the 2020-10 South Africa snapshot.
-- Phase 1 and Phase 2 contain the largest groups, but Phase 3 and Phase 4 still represent millions of people.
+- Phase 5 is labelled Not reported because the supplied source value is missing.
 
 ipc_phase_distribution_percentage.png:
 - Shows the same IPC phase distribution as percentages of the classified population.
-- The chart supports the Phase 3+ result of 16% in crisis-or-worse food insecurity.
+- The chart keeps Phase 5 as Not reported and uses the source-reported Phase 3+ result for the crisis-or-worse KPI.
 
 food_security_overview_dashboard.png:
 - Combines the trend view and IPC snapshot for use in the report or presentation.

@@ -1,6 +1,6 @@
 FINAL SUBMISSION CHECKLIST
 
-[ ] Add group member names and student numbers to the DOCX/PDF.
+[x] Group member names and student numbers added to the DOCX/PDF.
 [x] Raw datasets preserved unchanged.
 [x] Cleaned South Africa datasets created.
 [x] Missing values and cleaning decisions documented.

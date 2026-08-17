@@ -1,131 +1,140 @@
 # NDTA631 Data Analysis and Visualisation
 
-Professional repository for the NDTA631 2026 group assignment. The project analyses South African food security indicators from World Bank Data360 and organises the complete workflow from raw datasets to reporting, charts, database work, and demo evidence.
+Professional, reproducible analysis of South African food-security indicators for the NDTA631 2026 group assignment. The project combines an annual severe-food-insecurity series with an October 2020 Integrated Food Security Phase Classification (IPC) snapshot to communicate the available evidence clearly and responsibly.
 
-## Project Focus
+## Group Members
 
-| Area | Details |
+1. Sibusiso Agent Mathonsi 202331971
+2. Kegoikantse Sebetseba 202414220
+3. Agcobile Qabo 202469432
+4. Lebogang Malatjie 202404978
+5. Tlotlo Naledi 202422544
+6. Tlotlanang Naledi 202422539
+
+## Stakeholder-ready deliverables
+
+| Deliverable | Location | Use |
+| --- | --- | --- |
+| Analysis workbook | `Python or Excel Data Analysis/food_security_analysis_workbook.xlsx` | Excel-based review of the Summary, SVFI Trend, and IPC Phase Snapshot tables and charts |
+| Final charts | `Visualisation/` | Presentation-ready PNG exports, including the overview dashboard |
+| Written report | `Report & Demo/NDTA631_Group_Report.docx` and `.pdf` | Narrative, methods, findings, and recommendations |
+| Database evidence | `Database Integration/food_security.db`, `schema.sql`, `queries.sql`, and exported query-result CSVs | Auditable SQLite integration and SQL evidence |
+| Reproducible workflow | `Python or Excel Data Analysis/food_security_pipeline.py` | Regenerates the derived outputs from the preserved raw extracts |
+
+## Analysis scope
+
+| Topic | Evidence used | Scope |
+| --- | --- | --- |
+| Severe food insecurity prevalence | World Development Indicators extract | South Africa, annual observations available for 2018–2023; unit: percentage of population |
+| IPC phase distribution | Integrated Food Security Phase Classification extract | South Africa, October 2020 snapshot; units: persons and percentage of classified population |
+
+This is a descriptive analysis of the observations supplied in the project extracts. The two datasets differ in metric and time coverage, so they are presented as complementary views rather than as directly interchangeable measures.
+
+## Important reporting caveat
+
+The October 2020 South Africa IPC record for **Phase 5 – Famine** is missing for both persons and percentage. It is not an observed zero. The analysis keeps the raw missing values and labels Phase 5 as **Not reported** in stakeholder-facing outputs.
+
+For stakeholder communication, use the source-supplied Phase 3+ result rather than implying a confirmed Phase 5 value: **9,335,159 people, or 16.0% of the classified population, were recorded in Phase 3 or above** in the October 2020 snapshot. The full evidence and wording guidance are in [DATA_SOURCES_AND_PROVENANCE.md](DATA_SOURCES_AND_PROVENANCE.md).
+
+## Repository structure
+
+| Folder | Contents |
 | --- | --- |
-| Module | NDTA631 Data Analysis and Visualisation |
-| Assessment | Group Assignment 2026 |
-| Topic | South African food security and severe food insecurity |
-| Data source | World Bank Data360 / World Bank Open Data |
-| Due date | 24 August 2026 |
-| Main tools | Python, Pandas, NumPy, Matplotlib, Seaborn, SQL or Excel |
+| `Raw datasets/` | Preserved source CSV extracts. Do not edit these files. |
+| `Data Preparation/` | South Africa cleaned files, descriptive statistics, and data-quality notes. |
+| `Numeric Analysis/` | Numerical summaries, phase tables, and year-on-year calculations. |
+| `Python or Excel Data Analysis/` | Reusable Python pipeline, transformed tables, and Excel workbook. |
+| `Database Integration/` | SQLite database, schema, query script, query exports, and safe-operation evidence. |
+| `Visualisation/` | Final labelled PNG charts and chart explanations. |
+| `Report & Demo/` | Markdown, DOCX, and PDF report versions plus demo material. |
 
-## Research Story
+Each workflow folder includes a `PROCESS.txt` guide describing its role in the pipeline.
 
-This project uses two related food-security datasets to answer a clear question:
+## Data provenance
 
-> How do South Africa's food insecurity classifications and severe food insecurity prevalence describe the country's food security situation over time?
+The project uses two locally supplied World Bank Data360 extracts:
 
-The analysis should connect the datasets into one story by comparing:
+- `WB_WDI_SN_ITK_SVFI_ZS.csv` — World Development Indicators, indicator `WB_WDI_SN_ITK_SVFI_ZS`, *Prevalence of severe food insecurity in the population (%)*.
+- `IPC_IPC.csv` — Integrated Food Security Phase Classification database, including `IPC_IPC_P3PLUS` and phase-level observations.
 
-- People in different Integrated Food Security Phase Classification categories.
-- Severe food insecurity prevalence in the population.
-- Changes across time periods where South African observations are available.
-- Practical conclusions that can be explained clearly to a general reader.
+Read [DATA_SOURCES_AND_PROVENANCE.md](DATA_SOURCES_AND_PROVENANCE.md) before presenting the results. It records the source identifiers, country filters, data limitations, and the Phase 5 interpretation constraint. The supplied extracts do not include a download URL or retrieval timestamp, so those fields should be added from the source portal before any external publication.
 
-## Repository Structure
+## Reproduce the analysis
 
-| Folder | Purpose |
-| --- | --- |
-| `Raw datasets/` | Original food-security CSV files downloaded from World Bank Data360. Keep these files unchanged. |
-| `Data Preparation/` | Cleaning scripts, cleaned datasets, missing-value handling notes, and descriptive statistics. |
-| `Numeric Analysis/` | NumPy calculations, arrays, summary tables, and numerical interpretation. |
-| `Visualisation/` | Charts, labelled plots, exported figures, and trend explanations. |
-| `Database Integration/` | Database schema, SQL queries, import/export scripts, and database evidence. |
-| `Python or Excel Data Analysis/` | Python notebooks/scripts or Excel workbooks used for transformations, charts, and summaries. |
-| `Report & Demo/` | Final 7 to 9 page report, screenshots, presentation notes, and optional demo video material. |
+### Prerequisites
 
-Each main folder contains a `PROCESS.txt` guide explaining what should be done in that stage of the pipeline.
+- Python 3.10 or later (the current project environment was tested with Python 3.14.6).
+- Internet access is not required to run the pipeline because the input extracts are stored locally.
+- Microsoft Excel or a compatible spreadsheet application is recommended for reviewing the generated workbook.
 
-## Assignment Deliverables
+### Setup
 
-The final submission should include:
+From the repository root in PowerShell:
 
-- A 7 to 9 page report in DOCX and PDF formats.
-- A clean GitHub repository with code, data workflow, and execution instructions.
-- Python scripts, Jupyter notebooks, or Excel files showing the analysis.
-- Environment configuration and clear setup notes.
-- Clean, commented code with basic error handling.
-- Evidence of database integration, including queries and safe update/delete operations.
-- Clear visualisations with titles, labels, legends, and explanations.
-- Optional but recommended video demo or screenshots.
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
 
-## Suggested Workflow
+If script execution is restricted on a managed Windows device, activate the environment using the organisation-approved method, then run the same `pip` commands.
 
-1. Preserve the raw CSV files in `Raw datasets/`.
-2. Filter the datasets for South Africa records where needed.
-3. Clean column names, handle missing values, and save cleaned outputs in `Data Preparation/`.
-4. Use NumPy in `Numeric Analysis/` to calculate totals, changes, averages, and comparisons.
-5. Create labelled plots in `Visualisation/` using Matplotlib, Seaborn, Excel, or another approved tool.
-6. Build a small database in `Database Integration/`, load cleaned data, and run select, update, delete, and export queries safely.
-7. Summarise findings in `Python or Excel Data Analysis/` with transformed tables and charts.
-8. Write the final report and prepare demo evidence in `Report & Demo/`.
+### Run
 
-## Data Handling Rules
-
-- Do not edit the original raw CSV files directly.
-- Save cleaned or transformed outputs in the relevant process folder.
-- Use clear file names such as `cleaned_food_security.csv`, `summary_statistics.csv`, or `database_queries.sql`.
-- Document assumptions, missing values, filters, and transformations.
-- Keep charts readable with clear colour choices, titles, axis labels, and legends.
-
-## Running the Project
-
-The completed analysis pipeline is available at:
-
-```bash
+```powershell
 python "Python or Excel Data Analysis\food_security_pipeline.py"
 ```
 
-The script reads the raw CSV files, filters South Africa records, creates cleaned datasets, performs numerical analysis, builds a SQLite database, creates an Excel workbook, exports final charts, and generates the report/demo pack. A typical Python setup may look like:
+The script checks for both raw CSV inputs, filters South Africa records, creates cleaned and numerical outputs, writes the SQLite database and query exports, creates the Excel workbook and visualisations, and regenerates the report/demo pack. A successful run ends with:
 
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install pandas numpy matplotlib seaborn openpyxl
+```text
+Food security analysis pipeline completed successfully.
 ```
 
-If the group uses Excel instead of Python for parts of the analysis, place the workbook in `Python or Excel Data Analysis/` and include screenshots or exported charts in the relevant folders.
+> **Important:** Running the pipeline intentionally replaces generated files in `Data Preparation/`, `Numeric Analysis/`, `Database Integration/`, `Visualisation/`, `Python or Excel Data Analysis/`, and `Report & Demo/`. Preserve any manual edits or presentation annotations before rerunning it. It does not modify the raw source CSV files.
 
-## Completed Outputs
+## Verification checklist
 
-| Folder | Output |
+After a successful run, confirm that these evidence items are present:
+
+- `Data Preparation/cleaned_severe_food_insecurity_south_africa.csv` and `cleaned_ipc_phase_distribution_south_africa.csv`
+- `Numeric Analysis/numerical_summary.csv` and `ipc_phase_summary.csv`
+- `Python or Excel Data Analysis/food_security_analysis_workbook.xlsx`
+- `Database Integration/food_security.db` plus `query_result_*.csv`
+- `Visualisation/food_security_overview_dashboard.png`
+- `Report & Demo/NDTA631_Group_Report.pdf`
+
+Open the Excel workbook to validate the analysis tables and embedded charts, and use the generated PNG files as report or slide exports. When discussing results, retain the units exactly as labelled: percentages for severe food insecurity, people/percentage for the IPC snapshot, and percentage points for year-on-year changes.
+
+## Database integration
+
+The pipeline creates `Database Integration/food_security.db` with these analytical tables:
+
+- `ipc_cleaned`
+- `ipc_phase_distribution`
+- `severe_food_insecurity`
+- `ipc_phase_summary`
+
+`schema.sql` documents the analytical fields, and `queries.sql` records the SELECT statements and safe UPDATE/DELETE examples. The safe examples use `WHERE` clauses and a copied demonstration table; they are evidence of safe-query patterns, not a change to the production analytical data. Exported query results provide an auditable bridge between SQLite and the report/visual outputs.
+
+## Technology stack
+
+| Area | Tooling |
 | --- | --- |
-| `Data Preparation/` | Cleaned South Africa CSV files, descriptive statistics, and data quality notes |
-| `Numeric Analysis/` | IPC phase summary, severe food insecurity year-on-year change, numerical summary, and findings notes |
-| `Python or Excel Data Analysis/` | Reusable Python pipeline, transformed analysis tables, and Excel workbook |
-| `Database Integration/` | SQLite database, schema, SQL queries, exported query results, and safe update/delete evidence |
-| `Visualisation/` | Final PNG charts and chart explanation notes |
-| `Report & Demo/` | Report draft in Markdown, DOCX, and PDF formats plus demo script and final checklist |
+| Data preparation and analysis | Python, Pandas, NumPy |
+| Visualisation | Matplotlib and Seaborn; Excel workbook charts for spreadsheet review |
+| Database | SQLite through Python's standard `sqlite3` module |
+| Excel output | OpenPyXL |
+| Report generation | Python standard library, Matplotlib PDF backend, and generated DOCX/PDF artifacts |
 
-Key findings from the current outputs:
+Exact third-party package versions used in the current project environment are pinned in `requirements.txt`.
 
-- Severe food insecurity prevalence increased from 6.9% in 2018 to 8.5% in 2023.
-- The average severe food insecurity prevalence across the available years is 7.95%.
-- In the IPC 2020-10 snapshot, 9,335,159 people were in Phase 3 or above.
-- IPC Phase 3 or above represents 16.0% of the classified South African population in the available snapshot.
+## Submission readiness
 
-## Marking Alignment
-
-| Criterion | Marks | Repository Evidence |
-| --- | ---: | --- |
-| Data Preparation | 15 | Cleaned data, missing-value handling, descriptive statistics |
-| Numerical Analysis | 20 | NumPy arrays, calculations, tables, explained findings |
-| Visualisation | 20 | Bar charts, scatter plots, histograms, box plots, trend explanations |
-| Database Integration | 20 | Database file, schema, SQL queries, safe updates/deletes, Pandas import |
-| Python/Excel Analysis | 15 | Transformed tables, formulas or scripts, charts, summaries |
-| Report & Demo | 10 | Final report, screenshots, demo notes, optional video |
-
-## Team Quality Checklist
-
-- [ ] All group members' names and student numbers are included in report/code where required.
-- [x] At least two datasets are used together to tell one story.
-- [x] South Africa records are correctly filtered and explained.
-- [x] Missing values and data quality issues are documented.
-- [x] Numerical results are interpreted, not only calculated.
-- [x] Graphs are labelled and support the report conclusions.
-- [x] Database work is visible through scripts, query outputs, and schema files.
-- [x] Final report draft includes methods, charts, conclusions, and recommendations.
+- [x] Raw source extracts preserved.
+- [x] Reproducible Python pipeline and Excel workbook available.
+- [x] Cleaned data, numerical tables, visual exports, SQLite database, and query results present.
+- [x] Report and demo artifacts present.
+- [ ] Add team names and student numbers to the final report files.
+- [ ] Add the source portal URLs, retrieval dates, and any required citation/licence text before external publication.

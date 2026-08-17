@@ -1,9 +1,24 @@
 metric,value,unit
-"IPC total classified population, 2020-10",59130437.0,people
-"IPC people in Phase 3 or above, 2020-10",9335159.0,people
-"IPC percentage in Phase 3 or above, 2020-10",16.0,percent
-Calculated crisis-or-worse people from phase rows,9335159.0,people
+Severe food insecurity observations analyzed,6.0,records
+Severe food insecurity prevalence sum of annual observations,47.7,percent observation sum
 Severe food insecurity prevalence average,7.95,percent
 Severe food insecurity prevalence minimum,6.9,percent
 Severe food insecurity prevalence maximum,8.5,percent
+Severe food insecurity prevalence range,1.6,percentage points
 Severe food insecurity total change,1.6,percentage points
+Severe food insecurity relative change from first year,23.19,percent change
+Severe food insecurity average year-on-year change,0.32,percentage points
+Severe food insecurity largest year-on-year increase,0.6,percentage points
+Severe food insecurity first reshaped 3-year average,7.47,percent
+Severe food insecurity second reshaped 3-year average,8.43,percent
+Severe food insecurity reshaped-period difference,0.97,percentage points
+"IPC reported phase-row population, 2020-10",59130437.0,people
+"IPC reported phase-row share, 2020-10",100.0,percent
+"IPC source-reported people in Phase 3 or above, 2020-10",9335159.0,people
+"IPC source-reported percentage in Phase 3 or above, 2020-10",16.0,percent
+"Reported Phase 3-4 people from phase rows, 2020-10",9335159.0,people
+"Reported Phase 3-4 share from phase rows, 2020-10",16.0,percent
+"IPC people in Phase 1-2, 2020-10",49795278.0,people
+"IPC percentage in Phase 1-2, 2020-10",84.0,percent
+IPC people count range across reported phases,33790406.0,people
+IPC missing phase observations retained,2.0,records

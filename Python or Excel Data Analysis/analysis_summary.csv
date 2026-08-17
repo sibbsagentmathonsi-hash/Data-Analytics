@@ -1,4 +1,5 @@
 section,finding
-Severe food insecurity trend,South Africa's severe food insecurity prevalence reached 8.5% in 2023.
-IPC phase distribution,"The IPC 2020-10 snapshot shows most classified people in Phase 1 or Phase 2, but a meaningful share in Phase 3 or above."
+Severe food insecurity trend,"South Africa's severe food insecurity prevalence reached 8.5% in 2023, the latest supplied source observation."
+IPC phase distribution,"The IPC 2020-10 snapshot source-reports 9,335,159 people, or 16.0%, in Phase 3 or above."
+IPC Phase 5 limitation,Phase 5 is not reported in the supplied IPC phase rows and should not be displayed as zero.
 Project interpretation,The datasets can be used together to explain both longer-term severe food insecurity prevalence and a detailed phase snapshot.
